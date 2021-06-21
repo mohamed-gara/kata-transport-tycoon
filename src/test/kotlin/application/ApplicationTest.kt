@@ -11,9 +11,7 @@ internal class ApplicationTest {
   @TestFactory
   fun `compute transport duration`() =
     listOf(
-      "A" to 5,
-      "AB" to 5,
-      "BB" to 5,
+      "" to 0
     ).map { (containers, expectedDuration) ->
       dynamicTest("$containers are transported in $expectedDuration hours") {
         val result = sut.transport(containers)
