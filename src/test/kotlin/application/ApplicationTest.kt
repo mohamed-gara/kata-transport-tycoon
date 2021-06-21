@@ -13,6 +13,7 @@ internal class ApplicationTest {
     listOf(
       "" to 0,
       "B" to 5,
+      "BB" to 5,
     ).map { (containers, expectedDuration) ->
       dynamicTest("$containers are transported in $expectedDuration hours") {
         val result = sut.transport(containers)
