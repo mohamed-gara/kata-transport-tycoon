@@ -26,7 +26,7 @@ class Application {
 
   private fun tryTakingNextContainerBy(truck: Truck) {
     if (remainingContainer.isBlank()) return
-    if (truck.tryTakeContainer())
+    if (truck.tryTakeContainer(remainingContainer.first()))
       remainingContainer = remainingContainer.drop(1)
   }
 

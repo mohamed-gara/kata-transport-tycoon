@@ -3,6 +3,7 @@ package application
 data class Simulateur(
   private var hour: Int = 0,
 ) {
+
   fun finishHourFor(
     eachHour: (Int) -> Unit,
     stopCondition: () -> Boolean
