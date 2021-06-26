@@ -10,24 +10,23 @@ class Application {
   val clock = Clock()
 
   fun transport(containers: String): Int {
-    if (containers.isBlank()) return 0
-
     remainingContainer = containers
 
     while (true) {
+      if (allContainersAreDelivered()) return clock.hour
+
       tryTakingNextContainerBy(truck1)
       tryTakingNextContainerBy(truck2)
-
-      clock.advanceToNextHour()
 
       truck1.move()
       truck2.move()
 
-      if (allContainersAreDelivered()) return clock.hour
+      clock.advanceToNextHour()
     }
   }
 
   private fun tryTakingNextContainerBy(truck: Truck) {
+    if (remainingContainer.isBlank()) return
     if (truck.tryTakeContainer())
       remainingContainer = remainingContainer.drop(1)
   }
