@@ -12,6 +12,7 @@ internal class ApplicationTest {
       "" to 0,
       "B" to 5,
       "BB" to 5,
+      "BBB" to 15,
     ).map { (containers, expectedDuration) ->
       dynamicTest("$containers are transported in $expectedDuration hours") {
         val sut = application.Application()
