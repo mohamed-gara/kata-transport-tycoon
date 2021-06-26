@@ -23,4 +23,8 @@ data class Truck(
     startDrive()
     return true
   }
+
+  fun hasNoDeliveryInProgress(): Boolean {
+    return remaningHoursToDeliver == 0
+  }
 }

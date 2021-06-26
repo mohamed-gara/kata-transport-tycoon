@@ -32,5 +32,5 @@ class Application {
   }
 
   private fun allContainersAreDelivered() =
-    remainingContainer.isEmpty() && truck1.remaningHoursToDeliver == 0 && truck2.remaningHoursToDeliver == 0
+    remainingContainer.isEmpty() && truck1.hasNoDeliveryInProgress() && truck2.hasNoDeliveryInProgress()
 }
