@@ -6,15 +6,16 @@ import org.junit.jupiter.api.TestFactory
 
 internal class ApplicationTest {
 
-  private val sut = application.Application()
-
   @TestFactory
   fun `compute transport duration`() =
     listOf(
       "" to 0,
       "B" to 5,
+      "BB" to 5,
     ).map { (containers, expectedDuration) ->
       dynamicTest("$containers are transported in $expectedDuration hours") {
+        val sut = application.Application()
+
         val result = sut.transport(containers)
 
         assertThat(result).isEqualTo(expectedDuration)
