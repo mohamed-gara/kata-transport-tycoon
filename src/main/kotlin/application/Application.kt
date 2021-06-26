@@ -2,12 +2,12 @@ package application
 
 class Application {
 
-  var hour = 0
-
   val truck1 = Truck("1")
   val truck2 = Truck("2")
 
   var remainingContainer = ""
+
+  val clock = Clock()
 
   fun transport(containers: String): Int {
     if (containers.isBlank()) return 0
@@ -18,12 +18,12 @@ class Application {
       tryTakingNextContainerBy(truck1)
       tryTakingNextContainerBy(truck2)
 
-      hour++
+      clock.advanceToNextHour()
 
       truck1.move()
       truck2.move()
 
-      if (allContainersAreDelivred()) return hour
+      if (allContainersAreDelivered()) return clock.hour
     }
   }
 
@@ -32,6 +32,6 @@ class Application {
       remainingContainer = remainingContainer.drop(1)
   }
 
-  private fun allContainersAreDelivred() =
+  private fun allContainersAreDelivered() =
     remainingContainer.isEmpty() && truck1.remaningHoursToDeliver == 0 && truck2.remaningHoursToDeliver == 0
 }
