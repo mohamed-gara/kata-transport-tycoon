@@ -7,22 +7,21 @@ class Application {
 
   var remainingContainer = ""
 
-  val clock = Clock()
+  val simulator = Simulateur()
 
   fun transport(containers: String): Int {
     remainingContainer = containers
 
-    while (true) {
-      if (allContainersAreDelivered()) return clock.hour
+    return simulator.finishHourFor(
+      eachHour = {
+        tryTakingNextContainerBy(truck1)
+        tryTakingNextContainerBy(truck2)
 
-      tryTakingNextContainerBy(truck1)
-      tryTakingNextContainerBy(truck2)
-
-      truck1.move()
-      truck2.move()
-
-      clock.advanceToNextHour()
-    }
+        truck1.move()
+        truck2.move()
+      },
+      stopCondition = ::allContainersAreDelivered
+    )
   }
 
   private fun tryTakingNextContainerBy(truck: Truck) {
@@ -31,6 +30,6 @@ class Application {
       remainingContainer = remainingContainer.drop(1)
   }
 
-  private fun allContainersAreDelivered() =
+  private fun allContainersAreDelivered(): Boolean =
     remainingContainer.isEmpty() && truck1.hasNoDeliveryInProgress() && truck2.hasNoDeliveryInProgress()
 }
