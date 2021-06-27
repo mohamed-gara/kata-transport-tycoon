@@ -8,8 +8,12 @@ import org.junit.jupiter.api.TestFactory
 internal class ApplicationTest {
 
   @TestFactory
-  fun `compute transport duration for only B destination`(): List<DynamicTest> = tests(
+  fun `compute transport duration for no container`(): List<DynamicTest> = tests(
     "" to 0,
+  )
+
+  @TestFactory
+  fun `compute transport duration for only B destination`(): List<DynamicTest> = tests(
     "B" to 5,
     "BB" to 5,
     "BBB" to 15,
@@ -22,13 +26,17 @@ internal class ApplicationTest {
 
   @TestFactory
   fun `compute transport duration for only A destination`(): List<DynamicTest> = tests(
-    "" to 0,
     "A" to 5,
     "AA" to 13,
     "AAA" to 21,
     "AAAA" to 29,
     "AAAAA" to 37,
     "AAAAAA" to 45,
+  )
+
+  @TestFactory
+  fun `compute transport duration for both A and B destinations`(): List<DynamicTest> = tests(
+    "AB" to 5,
   )
 
   fun tests(vararg tests: Pair<String, Int>): List<DynamicTest> =
