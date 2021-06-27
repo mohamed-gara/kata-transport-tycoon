@@ -5,14 +5,14 @@ data class Truck(
   var remaningHoursToDeliver: Int = 0,
   var remaningHoursToGoHome: Int = 0,
   var targetIsPort: Boolean = false,
-) {
+) : ContainerHandler {
 
-  fun move() {
+  override fun move() {
     if (remaningHoursToDeliver > 0) remaningHoursToDeliver--
     else if (remaningHoursToGoHome > 0) remaningHoursToGoHome--
   }
 
-  fun tryTakeContainer(container: Char): Boolean {
+  override fun tryTakeContainer(container: Char): Boolean {
     if (isDriving()) return false
     return startDriveTo(container)
   }
@@ -33,11 +33,11 @@ data class Truck(
     return duration > 0
   }
 
-  fun hasNoDeliveryInProgress(): Boolean {
+  override fun hasNoDeliveryInProgress(): Boolean {
     return remaningHoursToDeliver == 0
   }
 
-  fun isAtPort(): Boolean {
+  override fun isAtPort(): Boolean {
     return targetIsPort && remaningHoursToDeliver == 0 && remaningHoursToGoHome == 1
   }
 }

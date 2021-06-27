@@ -27,7 +27,7 @@ class Application {
     return state
   }
 
-  private fun tryTakingNextContainerBy(state: State, truck: Truck) {
+  private fun tryTakingNextContainerBy(state: State, truck: ContainerHandler) {
     if (state.remainingContainerForTrucks.isBlank()) return
     if (truck.tryTakeContainer(state.remainingContainerForTrucks.first()))
       state.remainingContainerForTrucks = state.remainingContainerForTrucks.drop(1)
