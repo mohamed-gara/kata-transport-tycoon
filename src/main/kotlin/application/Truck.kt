@@ -1,36 +1,38 @@
 package application
 
 data class Truck(
-  var id: String,
-  var remaningHoursToDeliver: Int = 0,
-  var remaningHoursToGoHome: Int = 0,
-  var targetIsPort: Boolean = false,
+  val id: String,
+  val remaningHoursToDeliver: Int = 0,
+  val remaningHoursToGoHome: Int = 0,
+  val targetIsPort: Boolean = false,
 ) : ContainerHandler {
 
-  override fun move() {
-    if (remaningHoursToDeliver > 0) remaningHoursToDeliver--
-    else if (remaningHoursToGoHome > 0) remaningHoursToGoHome--
-  }
+  override fun move(): Truck =
+    when {
+      remaningHoursToDeliver > 0 -> copy(remaningHoursToDeliver = remaningHoursToDeliver - 1)
+      remaningHoursToGoHome > 0 -> copy(remaningHoursToGoHome = remaningHoursToGoHome - 1)
+      else -> this
+    }
 
-  override fun tryTakeContainer(container: Char): Boolean {
-    if (isDriving()) return false
-    return startDriveTo(container)
+  override fun tryTakeContainer(containerDestination: Char): Truck {
+    if (isDriving()) return this
+    return startDriveTo(containerDestination)
   }
 
   private fun isDriving() = remaningHoursToDeliver > 0 || remaningHoursToGoHome > 0
 
-  private fun startDriveTo(container: Char): Boolean {
+  private fun startDriveTo(container: Char): Truck {
     val destinations = mapOf(
       'A' to 1,
       'B' to 5,
     )
     val duration: Int = destinations[container] ?: 0
 
-    remaningHoursToDeliver = duration
-    remaningHoursToGoHome = duration
-    targetIsPort = duration == 1
-
-    return duration > 0
+    return copy(
+      remaningHoursToDeliver = duration,
+      remaningHoursToGoHome = duration,
+      targetIsPort = duration == 1
+    )
   }
 
   override fun hasNoDeliveryInProgress(): Boolean {

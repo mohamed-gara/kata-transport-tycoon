@@ -1,7 +1,7 @@
 package application
 
 data class State(
-  val remainingContainerForTrucks: String = "",
+  val remainingContainerForTrucks: String,
   private val remainingContainerForShip: Int = 0,
   private val truck1: Truck = Truck("1"),
   private val truck2: Truck = Truck("2"),
@@ -23,24 +23,35 @@ data class State(
         && containerHandlers.all { it.hasNoDeliveryInProgress() }
 
   fun calculateNextState(): State =
-    tryTakingNextContainerByTruck(truck1)
-      .tryTakingNextContainerByTruck(truck2)
-      .tryTakingNextContainerByShip(ship)
+    tryTakingNextContainerByTruck1()
+      .tryTakingNextContainerByTruck2()
+      .tryTakingNextContainerByShip()
       .moveHandlers()
       .unloadTrucksAtPort()
 
-  private fun tryTakingNextContainerByTruck(truck: ContainerHandler): State {
+  private fun tryTakingNextContainerByTruck1(): State {
     if (remainingContainerForTrucks.isBlank()) return this
-    if (truck.tryTakeContainer(remainingContainerForTrucks.first())) {
-      return copy(remainingContainerForTrucks = remainingContainerForTrucks.drop(1))
+    val newTruck1 = truck1.tryTakeContainer(remainingContainerForTrucks.first())
+    if (newTruck1 !== truck1) {
+      return copy(truck1 = newTruck1, remainingContainerForTrucks = remainingContainerForTrucks.drop(1))
     }
     return this
   }
 
-  private fun tryTakingNextContainerByShip(ship: ContainerHandler): State {
+  private fun tryTakingNextContainerByTruck2(): State {
+    if (remainingContainerForTrucks.isBlank()) return this
+    val newTruck2 = truck2.tryTakeContainer(remainingContainerForTrucks.first())
+    if (newTruck2 !== truck2) {
+      return copy(truck2 = newTruck2, remainingContainerForTrucks = remainingContainerForTrucks.drop(1))
+    }
+    return this
+  }
+
+  private fun tryTakingNextContainerByShip(): State {
     if (remainingContainerForShip == 0) return this
-    if (ship.tryTakeContainer('A')) {
-      return copy(remainingContainerForShip = remainingContainerForShip-1)
+    val newShip = ship.tryTakeContainer('A')
+    if (newShip !== ship) {
+      return copy(ship = newShip, remainingContainerForShip = remainingContainerForShip-1)
     }
     return this
   }
@@ -48,8 +59,9 @@ data class State(
   private fun unloadTrucksAtPort(): State =
     copy(remainingContainerForShip = remainingContainerForShip + numberOfTrucksArrivedToPort)
 
-  private fun moveHandlers(): State {
-    containerHandlers.forEach { it.move() }
-    return this
-  }
+  private fun moveHandlers(): State = copy(
+    truck1 = truck1.move(),
+    truck2 = truck2.move(),
+    ship = ship.move(),
+  )
 }

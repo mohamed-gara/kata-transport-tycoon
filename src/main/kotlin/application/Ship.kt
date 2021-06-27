@@ -2,28 +2,29 @@ package application
 
 data class Ship(
   val id: String = "",
-  var remaningHoursToDeliver: Int = 0,
-  var remaningHoursToGoHome: Int = 0
+  val remaningHoursToDeliver: Int = 0,
+  val remaningHoursToGoHome: Int = 0
 ): ContainerHandler {
 
-  override fun tryTakeContainer(containerDestination: Char): Boolean {
-    if (isNavigating()) return false
-    startNavigation()
-    return true
-  }
+  override fun tryTakeContainer(containerDestination: Char): Ship =
+    if (isNavigating()) this
+    else startNavigation()
 
   private fun isNavigating(): Boolean =
     remaningHoursToDeliver > 0 || remaningHoursToGoHome > 0
 
-  private fun startNavigation() {
-    remaningHoursToDeliver = 4
-    remaningHoursToGoHome = 4
-  }
+  private fun startNavigation(): Ship =
+    copy(
+      remaningHoursToDeliver = shipTripDuration,
+      remaningHoursToGoHome = shipTripDuration
+    )
 
-  override fun move() {
-    if (remaningHoursToDeliver > 0) remaningHoursToDeliver--
-    else if (remaningHoursToGoHome > 0) remaningHoursToGoHome--
-  }
+  override fun move(): Ship =
+    when {
+      remaningHoursToDeliver > 0 -> copy(remaningHoursToDeliver = remaningHoursToDeliver - 1)
+      remaningHoursToGoHome > 0 -> copy(remaningHoursToGoHome = remaningHoursToGoHome - 1)
+      else -> this
+    }
 
   override fun isAtPort(): Boolean {
     TODO("Not yet implemented")
@@ -33,3 +34,5 @@ data class Ship(
     return remaningHoursToDeliver == 0
   }
 }
+
+const val shipTripDuration = 4
