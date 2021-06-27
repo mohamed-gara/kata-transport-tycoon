@@ -26,6 +26,7 @@ internal class ApplicationTest {
     "A" to 5,
     "AA" to 13,
     "AAA" to 21,
+    "AAAA" to 29,
   )
 
   fun tests(vararg tests: Pair<String, Int>): List<DynamicTest> =
