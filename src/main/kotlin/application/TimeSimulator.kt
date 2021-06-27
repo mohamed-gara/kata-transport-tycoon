@@ -5,13 +5,17 @@ data class TimeSimulator(
 ) {
 
   fun finishHourFor(
-    eachHour: () -> Unit,
-    stopCondition: () -> Boolean
+    eachHour: (State) -> State,
+    stopWhen: (State) -> Boolean,
+    initialState: State
   ): Int {
-    while (true) {
-      if (stopCondition()) return hour
 
-      eachHour()
+    var currentState = initialState
+
+    while (true) {
+      if (stopWhen(currentState)) return hour
+
+      currentState = eachHour(currentState)
 
       advanceToNextHour()
     }

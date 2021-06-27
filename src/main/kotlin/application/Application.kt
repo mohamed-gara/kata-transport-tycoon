@@ -2,50 +2,47 @@ package application
 
 class Application {
 
-  val truck1 = Truck("1")
-  val truck2 = Truck("2")
-  val ship = Ship()
-
-  var remainingContainerForTrucks = ""
-  var remainingContainerForShip = 0
-
   val simulator = TimeSimulator()
 
   fun transport(containers: String): Int {
-    remainingContainerForTrucks = containers
-
     return simulator.finishHourFor(
-      eachHour = {
-        tryTakingNextContainerBy(truck1)
-        tryTakingNextContainerBy(truck2)
-        tryTakingNextContainerBy(ship)
-
-        truck1.move()
-        truck2.move()
-        ship.move()
-
-        if (truck1.isAtPort()) remainingContainerForShip++
-        if (truck2.isAtPort()) remainingContainerForShip++
-      },
-      stopCondition = ::allContainersAreDelivered
+      initialState = State(remainingContainerForTrucks=containers) ,
+      eachHour = ::calculateNextState,
+      stopWhen = ::allContainersAreDelivered
     )
   }
 
-  private fun tryTakingNextContainerBy(truck: Truck) {
-    if (remainingContainerForTrucks.isBlank()) return
-    if (truck.tryTakeContainer(remainingContainerForTrucks.first()))
-      remainingContainerForTrucks = remainingContainerForTrucks.drop(1)
+  private fun calculateNextState(state: State): State {
+    tryTakingNextContainerBy(state, state.truck1)
+    tryTakingNextContainerBy(state, state.truck2)
+    tryTakingNextContainerBy(state, state.ship)
+
+    state.truck1.move()
+    state.truck2.move()
+    state.ship.move()
+
+    if (state.truck1.isAtPort()) state.remainingContainerForShip++
+    if (state.truck2.isAtPort()) state.remainingContainerForShip++
+
+    return state
   }
 
-  private fun tryTakingNextContainerBy(ship: Ship) {
-    if (remainingContainerForShip == 0) return
-    if (ship.tryTakeContainer()) remainingContainerForShip--
+  private fun tryTakingNextContainerBy(state: State, truck: Truck) {
+    if (state.remainingContainerForTrucks.isBlank()) return
+    if (truck.tryTakeContainer(state.remainingContainerForTrucks.first()))
+      state.remainingContainerForTrucks = state.remainingContainerForTrucks.drop(1)
   }
 
-  private fun allContainersAreDelivered(): Boolean =
-    remainingContainerForTrucks.isEmpty()
-        && remainingContainerForShip == 0
-        && truck1.hasNoDeliveryInProgress()
-        && truck2.hasNoDeliveryInProgress()
-        && ship.hasNoDeliveryInProgress()
+  private fun tryTakingNextContainerBy(state: State, ship: Ship) {
+    if (state.remainingContainerForShip == 0) return
+    if (ship.tryTakeContainer()) state.remainingContainerForShip--
+  }
+
+  private fun allContainersAreDelivered(state: State): Boolean =
+    state.remainingContainerForTrucks.isEmpty()
+        && state.remainingContainerForShip == 0
+        && state.truck1.hasNoDeliveryInProgress()
+        && state.truck2.hasNoDeliveryInProgress()
+        && state.ship.hasNoDeliveryInProgress()
 }
+
