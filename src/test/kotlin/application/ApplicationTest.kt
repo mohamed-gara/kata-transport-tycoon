@@ -27,7 +27,8 @@ internal class ApplicationTest {
     "AA" to 13,
     "AAA" to 21,
     "AAAA" to 29,
-  )
+    "AAAAA" to 37,
+    )
 
   fun tests(vararg tests: Pair<String, Int>): List<DynamicTest> =
     listOf(*tests).map { (containers, expectedDuration) ->
