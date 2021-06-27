@@ -37,6 +37,8 @@ internal class ApplicationTest {
   @TestFactory
   fun `compute transport duration for both A and B destinations`(): List<DynamicTest> = tests(
     "AB" to 5,
+    "ABB" to 7,
+    "AABABBAB" to 29,
   )
 
   fun tests(vararg tests: Pair<String, Int>): List<DynamicTest> =
