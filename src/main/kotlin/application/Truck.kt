@@ -6,16 +6,6 @@ data class Truck(
   var remaningHoursToGoHome: Int = 0
 ) {
 
-  fun isDriving() = remaningHoursToDeliver > 0 || remaningHoursToGoHome > 0
-
-  fun startDrive(container: Char) {
-    val destinations = mapOf('B' to 5)
-    val duration: Int = destinations[container] ?: 0
-
-    remaningHoursToDeliver = duration
-    remaningHoursToGoHome = duration
-  }
-
   fun move() {
     if (remaningHoursToDeliver > 0) remaningHoursToDeliver--
     else if (remaningHoursToGoHome > 0) remaningHoursToGoHome--
@@ -23,8 +13,22 @@ data class Truck(
 
   fun tryTakeContainer(container: Char): Boolean {
     if (isDriving()) return false
-    startDrive(container)
-    return true
+    return startDriveTo(container)
+  }
+
+  private fun isDriving() = remaningHoursToDeliver > 0 || remaningHoursToGoHome > 0
+
+  private fun startDriveTo(container: Char): Boolean {
+    val destinations = mapOf(
+      'A' to 1,
+      'B' to 5,
+    )
+    val duration: Int = destinations[container] ?: 0
+
+    remaningHoursToDeliver = duration
+    remaningHoursToGoHome = duration
+
+    return duration > 0
   }
 
   fun hasNoDeliveryInProgress(): Boolean {

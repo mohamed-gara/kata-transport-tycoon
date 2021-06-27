@@ -20,9 +20,15 @@ internal class ApplicationTest {
     "BBBBBBBB" to 35,
   )
 
+  @TestFactory
+  fun `compute transport duration for only A destination`(): List<DynamicTest> = tests(
+    "" to 0,
+    "A" to 1,
+  )
+
   fun tests(vararg tests: Pair<String, Int>): List<DynamicTest> =
     listOf(*tests).map { (containers, expectedDuration) ->
-      dynamicTest("$containers are transported in $expectedDuration hours") {
+      dynamicTest("<$containers> are transported in $expectedDuration hours") {
         val sut = application.Application()
 
         val result = sut.transport(containers)
