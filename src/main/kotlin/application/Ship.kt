@@ -4,9 +4,9 @@ data class Ship(
   val id: String = "",
   var remaningHoursToDeliver: Int = 0,
   var remaningHoursToGoHome: Int = 0
-) {
+): ContainerHandler {
 
-  fun tryTakeContainer(): Boolean {
+  override fun tryTakeContainer(containerDestination: Char): Boolean {
     if (isNavigating()) return false
     startNavigation()
     return true
@@ -20,12 +20,16 @@ data class Ship(
     remaningHoursToGoHome = 4
   }
 
-  fun move() {
+  override fun move() {
     if (remaningHoursToDeliver > 0) remaningHoursToDeliver--
     else if (remaningHoursToGoHome > 0) remaningHoursToGoHome--
   }
 
-  fun hasNoDeliveryInProgress(): Boolean {
+  override fun isAtPort(): Boolean {
+    TODO("Not yet implemented")
+  }
+
+  override fun hasNoDeliveryInProgress(): Boolean {
     return remaningHoursToDeliver == 0
   }
 }
