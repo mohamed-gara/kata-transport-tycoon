@@ -7,7 +7,7 @@ class Application {
 
   var remainingContainer = ""
 
-  val simulator = Simulateur()
+  val simulator = TimeSimulator()
 
   fun transport(containers: String): Int {
     remainingContainer = containers

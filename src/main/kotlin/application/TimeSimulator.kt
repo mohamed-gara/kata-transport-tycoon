@@ -1,17 +1,17 @@
 package application
 
-data class Simulateur(
+data class TimeSimulator(
   private var hour: Int = 0,
 ) {
 
   fun finishHourFor(
-    eachHour: (Int) -> Unit,
+    eachHour: () -> Unit,
     stopCondition: () -> Boolean
   ): Int {
     while (true) {
       if (stopCondition()) return hour
 
-      eachHour(hour)
+      eachHour()
 
       advanceToNextHour()
     }
