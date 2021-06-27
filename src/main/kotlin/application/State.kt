@@ -20,30 +20,32 @@ data class State(
         && containerHandlers.all { it.hasNoDeliveryInProgress() }
 
   fun calculateNextState(): State {
-    tryTakingNextContainerByTruck(truck1)
-    tryTakingNextContainerByTruck(truck2)
-    tryTakingNextContainerByShip(ship)
+    val state = tryTakingNextContainerByTruck(truck1)
+      .tryTakingNextContainerByTruck(truck2)
+      .tryTakingNextContainerByShip(ship)
 
     containerHandlers.forEach { it.move() }
 
     trucks.forEach {
-      if (it.isAtPort()) remainingContainerForShip++
+      if (it.isAtPort()) state.remainingContainerForShip++
     }
 
+    return state
+  }
+
+  private fun tryTakingNextContainerByTruck(truck: ContainerHandler): State {
+    if (remainingContainerForTrucks.isBlank()) return this
+    if (truck.tryTakeContainer(remainingContainerForTrucks.first())) {
+      return copy(remainingContainerForTrucks = remainingContainerForTrucks.drop(1))
+    }
     return this
   }
 
-  private fun tryTakingNextContainerByTruck(truck: ContainerHandler) {
-    if (remainingContainerForTrucks.isBlank()) return
-    if (truck.tryTakeContainer(remainingContainerForTrucks.first())) {
-      remainingContainerForTrucks = remainingContainerForTrucks.drop(1)
-    }
-  }
-
-  private fun tryTakingNextContainerByShip(ship: ContainerHandler) {
-    if (remainingContainerForShip == 0) return
+  private fun tryTakingNextContainerByShip(ship: ContainerHandler): State {
+    if (remainingContainerForShip == 0) return this
     if (ship.tryTakeContainer('A')) {
-      remainingContainerForShip--
+      return copy(remainingContainerForShip = remainingContainerForShip-1)
     }
+    return this
   }
 }
