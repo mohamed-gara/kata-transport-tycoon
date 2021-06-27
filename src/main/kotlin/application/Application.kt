@@ -13,29 +13,31 @@ class Application {
   }
 
   private fun calculateNextState(state: State): State {
-    tryTakingNextContainerBy(state, state.truck1)
-    tryTakingNextContainerBy(state, state.truck2)
-    tryTakingNextContainerBy(state, state.ship)
+    tryTakingNextContainerByTruck(state, state.truck1)
+    tryTakingNextContainerByTruck(state, state.truck2)
+    tryTakingNextContainerByShip(state, state.ship)
 
-    state.truck1.move()
-    state.truck2.move()
-    state.ship.move()
+    state.containerHandlers.forEach { it.move() }
 
-    if (state.truck1.isAtPort()) state.remainingContainerForShip++
-    if (state.truck2.isAtPort()) state.remainingContainerForShip++
+    state.trucks.forEach {
+      if (it.isAtPort()) state.remainingContainerForShip++
+    }
 
     return state
   }
 
-  private fun tryTakingNextContainerBy(state: State, truck: ContainerHandler) {
+  private fun tryTakingNextContainerByTruck(state: State, truck: ContainerHandler) {
     if (state.remainingContainerForTrucks.isBlank()) return
-    if (truck.tryTakeContainer(state.remainingContainerForTrucks.first()))
+    if (truck.tryTakeContainer(state.remainingContainerForTrucks.first())) {
       state.remainingContainerForTrucks = state.remainingContainerForTrucks.drop(1)
+    }
   }
 
-  private fun tryTakingNextContainerBy(state: State, ship: Ship) {
+  private fun tryTakingNextContainerByShip(state: State, ship: ContainerHandler) {
     if (state.remainingContainerForShip == 0) return
-    if (ship.tryTakeContainer()) state.remainingContainerForShip--
+    if (ship.tryTakeContainer('A')) {
+      state.remainingContainerForShip--
+    }
   }
 
   private fun allContainersAreDelivered(state: State): Boolean =
