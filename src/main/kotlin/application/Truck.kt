@@ -3,7 +3,8 @@ package application
 data class Truck(
   var id: String,
   var remaningHoursToDeliver: Int = 0,
-  var remaningHoursToGoHome: Int = 0
+  var remaningHoursToGoHome: Int = 0,
+  var targetIsPort: Boolean = false,
 ) {
 
   fun move() {
@@ -27,11 +28,16 @@ data class Truck(
 
     remaningHoursToDeliver = duration
     remaningHoursToGoHome = duration
+    targetIsPort = duration == 1
 
     return duration > 0
   }
 
   fun hasNoDeliveryInProgress(): Boolean {
     return remaningHoursToDeliver == 0
+  }
+
+  fun isAtPort(): Boolean {
+    return targetIsPort && remaningHoursToDeliver == 0 && remaningHoursToGoHome == 1
   }
 }

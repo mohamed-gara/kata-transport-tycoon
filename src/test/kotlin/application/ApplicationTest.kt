@@ -23,7 +23,7 @@ internal class ApplicationTest {
   @TestFactory
   fun `compute transport duration for only A destination`(): List<DynamicTest> = tests(
     "" to 0,
-    "A" to 1,
+    "A" to 5,
   )
 
   fun tests(vararg tests: Pair<String, Int>): List<DynamicTest> =
