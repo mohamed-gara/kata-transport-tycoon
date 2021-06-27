@@ -1,37 +1,33 @@
 package application
 
 data class State(
-  var remainingContainerForTrucks: String = "",
-  var remainingContainerForShip: Int = 0,
-  val truck1: Truck = Truck("1"),
-  val truck2: Truck = Truck("2"),
-  val ship: Ship = Ship(),
+  val remainingContainerForTrucks: String = "",
+  private val remainingContainerForShip: Int = 0,
+  private val truck1: Truck = Truck("1"),
+  private val truck2: Truck = Truck("2"),
+  private val ship: Ship = Ship(),
 ) {
 
-  val containerHandlers: List<ContainerHandler>
+  private val containerHandlers: List<ContainerHandler>
     get() = listOf(truck1, truck2, ship)
 
-  val trucks: List<Truck>
+  private val trucks: List<Truck>
     get() = listOf(truck1, truck2)
+
+  private val numberOfTrucksArrivedToPort: Int
+    get() = trucks.count { it.isAtPort() }
 
   fun allContainersAreDelivered(): Boolean =
     remainingContainerForTrucks.isEmpty()
         && remainingContainerForShip == 0
         && containerHandlers.all { it.hasNoDeliveryInProgress() }
 
-  fun calculateNextState(): State {
-    val state = tryTakingNextContainerByTruck(truck1)
+  fun calculateNextState(): State =
+    tryTakingNextContainerByTruck(truck1)
       .tryTakingNextContainerByTruck(truck2)
       .tryTakingNextContainerByShip(ship)
-
-    containerHandlers.forEach { it.move() }
-
-    trucks.forEach {
-      if (it.isAtPort()) state.remainingContainerForShip++
-    }
-
-    return state
-  }
+      .moveHandlers()
+      .unloadTrucksAtPort()
 
   private fun tryTakingNextContainerByTruck(truck: ContainerHandler): State {
     if (remainingContainerForTrucks.isBlank()) return this
@@ -46,6 +42,14 @@ data class State(
     if (ship.tryTakeContainer('A')) {
       return copy(remainingContainerForShip = remainingContainerForShip-1)
     }
+    return this
+  }
+
+  private fun unloadTrucksAtPort(): State =
+    copy(remainingContainerForShip = remainingContainerForShip + numberOfTrucksArrivedToPort)
+
+  private fun moveHandlers(): State {
+    containerHandlers.forEach { it.move() }
     return this
   }
 }
