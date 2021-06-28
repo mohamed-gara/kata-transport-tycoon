@@ -2,24 +2,13 @@ package application
 
 data class Truck(
   val id: String,
-  private val remainingHoursToDeliver: Int = 0,
-  private val remainingHoursToGoHome: Int = 0,
-  private val destinationIsPort: Boolean = false,
+  private val trip: Trip = Trip(0)
 ) : ContainerHandler {
 
-  override fun move(): Truck =
-    when {
-      remainingHoursToDeliver > 0 -> copy(remainingHoursToDeliver = remainingHoursToDeliver - 1)
-      remainingHoursToGoHome > 0 -> copy(remainingHoursToGoHome = remainingHoursToGoHome - 1)
-      else -> this
-    }
-
   override fun tryCarryContainerTo(containerDestination: Char): Truck {
-    if (isDriving()) return this
+    if (trip.inProgress) return this
     return startDriveTo(containerDestination)
   }
-
-  private fun isDriving() = remainingHoursToDeliver > 0 || remainingHoursToGoHome > 0
 
   private fun startDriveTo(container: Char): Truck {
     val destinations = mapOf(
@@ -28,18 +17,19 @@ data class Truck(
     )
     val duration: Int = destinations[container] ?: 0
 
-    return copy(
-      remainingHoursToDeliver = duration,
-      remainingHoursToGoHome = duration,
-      destinationIsPort = duration == 1
-    )
+    return copy(trip= Trip(duration))
   }
+
+  override fun move(): Truck =
+    when {
+      trip.inProgress -> copy(trip = trip.advance())
+      else -> this
+    }
 
   override fun hasNoDeliveryInProgress(): Boolean {
-    return remainingHoursToDeliver == 0
+    return !trip.deliveryInProgress
   }
 
-  override fun isAtPort(): Boolean {
-    return destinationIsPort && remainingHoursToDeliver == 0 && remainingHoursToGoHome == 1
-  }
+  override fun isAtPort(): Boolean =
+    trip.elapsedDuration == 1 && trip.duration == 1
 }
