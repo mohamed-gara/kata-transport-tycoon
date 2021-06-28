@@ -4,10 +4,10 @@ import java.lang.RuntimeException
 
 data class TimeSimulator(
   private var hour: Int = 0,
-  private val logEnabled: Boolean = false
+  private val logEnabled: Boolean = true
 ) {
 
-  fun finishHourFor(
+  fun calculateEndHour(
     eachHour: (State) -> State,
     stopWhen: (State) -> Boolean,
     initialState: State
@@ -16,26 +16,22 @@ data class TimeSimulator(
     var currentState = initialState
 
     while (true) {
-      logMessage("Tick: hour $hour")
+      logMessage("state at the beginning of $hour: $currentState")
 
       if (stopWhen(currentState)) {
         logMessage("Stop at hour: $hour")
         return hour
       }
 
-      logMessage("state at $hour (begin): $currentState")
-
       currentState = eachHour(currentState)
 
-      logMessage("state at $hour (end)  : $currentState")
-
-      advanceToNextHour()
+      advanceTimeToNextHour()
 
       if (hour == 100) throw RuntimeException("Too much iterations...")
     }
   }
 
-  private fun advanceToNextHour() {
+  private fun advanceTimeToNextHour() {
     hour++
   }
 

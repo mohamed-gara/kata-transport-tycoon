@@ -1,8 +1,9 @@
 package application
 
 interface ContainerHandler {
-  fun tryTakeContainer(containerDestination: Char): ContainerHandler
-  fun hasNoDeliveryInProgress(): Boolean
+  fun tryCarryContainerTo(containerDestination: Char): ContainerHandler
   fun move(): ContainerHandler
+
+  fun hasNoDeliveryInProgress(): Boolean
   fun isAtPort(): Boolean
 }
