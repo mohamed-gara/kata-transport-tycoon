@@ -6,7 +6,7 @@ class Application {
 
   fun transport(containersDestinations: String): Int =
     simulator.calculateEndHour(
-      initialState = State(containersAtFactory=containersDestinations) ,
+      initialState = State(Factory(containersDestinations)) ,
       eachHour     = State::calculateNextState,
       stopWhen     = State::allContainersAreDelivered
     )

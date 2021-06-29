@@ -1,7 +1,7 @@
 package application
 
 data class State(
-  private val containersAtFactory: String,
+  private val factory: Factory,
   private val containersAtPort: Int = 0,
   private val truck1: Truck = Truck("1"),
   private val truck2: Truck = Truck("2"),
@@ -18,7 +18,7 @@ data class State(
     get() = trucks.count { it.isAtPort() }
 
   fun allContainersAreDelivered(): Boolean =
-    containersAtFactory.isEmpty()
+    factory.hasNoContainerToDeliver()
         && containersAtPort == 0
         && containerHandlers.none { it.hasDeliveryInProgress() }
 
@@ -30,23 +30,23 @@ data class State(
       .unloadTrucksAtPort()
 
   private fun tryTakingNextContainerByTruck1(): State {
-    if (containersAtFactory.isBlank()) return this
+    if (factory.hasNoContainerToDeliver()) return this
 
-    val trip = trunckTripFor(containersAtFactory.first())
+    val trip = trunckTripFor(factory.nextContainerToDeliver())
     val newTruck1 = truck1.tryCarryContainer(trip)
     if (newTruck1 !== truck1) {
-      return copy(truck1 = newTruck1, containersAtFactory = containersAtFactory.drop(1))
+      return copy(truck1 = newTruck1, factory= factory.copy(containersAtFactory = factory.peekNextContainerToDeliver()))
     }
     return this
   }
 
   private fun tryTakingNextContainerByTruck2(): State {
-    if (containersAtFactory.isBlank()) return this
+    if (factory.hasNoContainerToDeliver()) return this
 
-    val trip = trunckTripFor(containersAtFactory.first())
+    val trip = trunckTripFor(factory.containersAtFactory.first())
     val newTruck2 = truck2.tryCarryContainer(trip)
     if (newTruck2 !== truck2) {
-      return copy(truck2 = newTruck2, containersAtFactory = containersAtFactory.drop(1))
+      return copy(truck2 = newTruck2, factory= factory.copy(containersAtFactory = factory.peekNextContainerToDeliver()))
     }
     return this
   }
