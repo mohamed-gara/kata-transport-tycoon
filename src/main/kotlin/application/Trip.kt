@@ -17,3 +17,12 @@ data class Trip(
     if (inProgress) copy(elapsedDuration=elapsedDuration+1)
     else this
 }
+
+fun truckTripFor(destination: Char): Trip {
+  val destinations = mapOf(
+    'A' to 1,
+    'B' to 5,
+  )
+  val duration: Int = destinations[destination] ?: 0
+  return Trip(duration)
+}

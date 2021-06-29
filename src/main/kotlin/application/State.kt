@@ -30,44 +30,26 @@ data class State(
       .moveHandlers()
       .unloadTrucksAtPort()
 
-  private fun tryTakingNextContainerByTruck1(): State {
-    if (factory.hasNoContainerToDeliver()) return this
+  private fun tryTakingNextContainerByTruck1(): State =
+    factory.nextContainerToDeliver()
+      .map { truckTripFor(it) }
+      .filter { trip -> truck1.canCarryContainer(trip) }
+      .map { trip -> copy(truck1 = truck1.carryContainer(trip), factory = factory.peekNextContainerToDeliver()) }
+      .orElse(this)
 
-    val trip = truckTripFor(factory.nextContainerToDeliver())
-    if (truck1.canCarryContainer(trip)) {
-      return copy(truck1 = truck1.carryContainer(trip), factory = factory.peekNextContainerToDeliver())
-    }
-    return this
-  }
+  private fun tryTakingNextContainerByTruck2(): State =
+    factory.nextContainerToDeliver()
+      .map { truckTripFor(it) }
+      .filter { trip -> truck2.canCarryContainer(trip) }
+      .map { trip -> copy(truck2 = truck2.carryContainer(trip), factory = factory.peekNextContainerToDeliver()) }
+      .orElse(this)
 
-  private fun tryTakingNextContainerByTruck2(): State {
-    if (factory.hasNoContainerToDeliver()) return this
-
-    val trip = truckTripFor(factory.nextContainerToDeliver())
-    if (truck2.canCarryContainer(trip)) {
-      return copy(truck2 = truck1.carryContainer(trip), factory = factory.peekNextContainerToDeliver())
-    }
-    return this
-  }
-
-  private fun truckTripFor(destination: Char): Trip {
-    val destinations = mapOf(
-      'A' to 1,
-      'B' to 5,
-    )
-    val duration: Int = destinations[destination] ?: 0
-    return Trip(duration)
-  }
-
-  private fun tryTakingNextContainerByShip(): State {
-    if (port.containersAtPort == 0) return this
-
-    val trip = Trip(4)
-    if (ship.canCarryContainer(trip)) {
-      return copy(ship = ship.carryContainer(trip), port = port.peekNextContainerToDeliver())
-    }
-    return this
-  }
+  private fun tryTakingNextContainerByShip(): State =
+    port.nextContainerToDeliver()
+      .map { Trip(4) }
+      .filter { trip -> ship.canCarryContainer(trip) }
+      .map { trip -> copy(ship = ship.carryContainer(trip), port = port.peekNextContainerToDeliver()) }
+      .orElse(this)
 
   private fun unloadTrucksAtPort(): State =
     copy(port = port.putInWarehouse(numberOfTrucksArrivedToPort))

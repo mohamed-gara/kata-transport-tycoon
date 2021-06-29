@@ -1,5 +1,7 @@
 package application
 
+import java.util.*
+
 data class Factory(
   val containersAtFactory: String
 ) {
@@ -7,8 +9,9 @@ data class Factory(
   fun hasNoContainerToDeliver(): Boolean =
     containersAtFactory.isEmpty()
 
-  fun nextContainerToDeliver(): Char =
-    containersAtFactory.first()
+  fun nextContainerToDeliver(): Optional<Char> =
+    if (containersAtFactory.isNotEmpty()) Optional.of(containersAtFactory.first())
+    else Optional.empty()
 
   fun peekNextContainerToDeliver(): Factory =
     copy(containersAtFactory=containersAtFactory.drop(1))
