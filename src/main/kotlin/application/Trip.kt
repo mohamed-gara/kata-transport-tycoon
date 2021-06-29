@@ -5,13 +5,13 @@ data class Trip(
   val elapsedDuration: Int = 0,
 ) {
   val inProgress: Boolean
-    get() = elapsedDuration < (duration * 2)
+    get() = duration != 0 && elapsedDuration < (duration * 2)
 
   val deliveryInProgress: Boolean
-    get() = elapsedDuration < duration
+    get() = duration != 0 && elapsedDuration < duration
 
   val goBackInProgress: Boolean
-    get() = elapsedDuration in (duration+1)..(duration * 2)
+    get() = duration != 0 && elapsedDuration in (duration+1)..(duration * 2)
 
   fun advance(): Trip =
     if (inProgress) copy(elapsedDuration=elapsedDuration+1)

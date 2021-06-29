@@ -5,20 +5,9 @@ data class Truck(
   private val trip: Trip = Trip(0)
 ) : ContainerHandler {
 
-  override fun tryCarryContainerTo(containerDestination: Char): Truck {
-    if (trip.inProgress) return this
-    return startDriveTo(containerDestination)
-  }
-
-  private fun startDriveTo(container: Char): Truck {
-    val destinations = mapOf(
-      'A' to 1,
-      'B' to 5,
-    )
-    val duration: Int = destinations[container] ?: 0
-
-    return copy(trip= Trip(duration))
-  }
+  override fun tryCarryContainer(trip: Trip): Truck =
+    if (this.trip.inProgress) this
+    else copy(trip= trip)
 
   override fun move(): Truck =
     when {
@@ -26,8 +15,8 @@ data class Truck(
       else -> this
     }
 
-  override fun hasNoDeliveryInProgress(): Boolean {
-    return !trip.deliveryInProgress
+  override fun hasDeliveryInProgress(): Boolean {
+    return trip.deliveryInProgress
   }
 
   override fun isAtPort(): Boolean =

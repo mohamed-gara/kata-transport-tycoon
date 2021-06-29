@@ -20,7 +20,7 @@ data class State(
   fun allContainersAreDelivered(): Boolean =
     containersAtFactory.isEmpty()
         && containersAtPort == 0
-        && containerHandlers.all { it.hasNoDeliveryInProgress() }
+        && containerHandlers.none { it.hasDeliveryInProgress() }
 
   fun calculateNextState(): State =
     tryTakingNextContainerByTruck1()
@@ -31,7 +31,9 @@ data class State(
 
   private fun tryTakingNextContainerByTruck1(): State {
     if (containersAtFactory.isBlank()) return this
-    val newTruck1 = truck1.tryCarryContainerTo(containersAtFactory.first())
+
+    val trip = trunckTripFor(containersAtFactory.first())
+    val newTruck1 = truck1.tryCarryContainer(trip)
     if (newTruck1 !== truck1) {
       return copy(truck1 = newTruck1, containersAtFactory = containersAtFactory.drop(1))
     }
@@ -40,16 +42,27 @@ data class State(
 
   private fun tryTakingNextContainerByTruck2(): State {
     if (containersAtFactory.isBlank()) return this
-    val newTruck2 = truck2.tryCarryContainerTo(containersAtFactory.first())
+
+    val trip = trunckTripFor(containersAtFactory.first())
+    val newTruck2 = truck2.tryCarryContainer(trip)
     if (newTruck2 !== truck2) {
       return copy(truck2 = newTruck2, containersAtFactory = containersAtFactory.drop(1))
     }
     return this
   }
 
+  private fun trunckTripFor(destination: Char): Trip {
+    val destinations = mapOf(
+      'A' to 1,
+      'B' to 5,
+    )
+    val duration: Int = destinations[destination] ?: 0
+    return Trip(duration)
+  }
+
   private fun tryTakingNextContainerByShip(): State {
     if (containersAtPort == 0) return this
-    val newShip = ship.tryCarryContainerTo('A')
+    val newShip = ship.tryCarryContainer(Trip(4))
     if (newShip !== ship) {
       return copy(ship = newShip, containersAtPort = containersAtPort-1)
     }
