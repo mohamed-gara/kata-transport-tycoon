@@ -5,9 +5,12 @@ data class Truck(
   private val trip: Trip = Trip(0)
 ) : ContainerHandler {
 
-  override fun tryCarryContainer(trip: Trip): Truck =
-    if (this.trip.inProgress) this
-    else copy(trip= trip)
+  override fun canCarryContainer(trip: Trip): Boolean =
+    !this.trip.inProgress
+
+  override fun carryContainer(trip: Trip): Truck =
+    if (canCarryContainer(trip)) copy(trip= trip)
+    else throw IllegalStateException("Truck $id is not available now.")
 
   override fun move(): Truck =
     when {

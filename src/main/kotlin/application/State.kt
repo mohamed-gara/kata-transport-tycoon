@@ -34,9 +34,8 @@ data class State(
     if (factory.hasNoContainerToDeliver()) return this
 
     val trip = truckTripFor(factory.nextContainerToDeliver())
-    val newTruck1 = truck1.tryCarryContainer(trip)
-    if (newTruck1 !== truck1) {
-      return copy(truck1 = newTruck1, factory = factory.peekNextContainerToDeliver())
+    if (truck1.canCarryContainer(trip)) {
+      return copy(truck1 = truck1.carryContainer(trip), factory = factory.peekNextContainerToDeliver())
     }
     return this
   }
@@ -44,10 +43,9 @@ data class State(
   private fun tryTakingNextContainerByTruck2(): State {
     if (factory.hasNoContainerToDeliver()) return this
 
-    val trip = truckTripFor(factory.containersAtFactory.first())
-    val newTruck2 = truck2.tryCarryContainer(trip)
-    if (newTruck2 !== truck2) {
-      return copy(truck2 = newTruck2, factory = factory.peekNextContainerToDeliver())
+    val trip = truckTripFor(factory.nextContainerToDeliver())
+    if (truck2.canCarryContainer(trip)) {
+      return copy(truck2 = truck1.carryContainer(trip), factory = factory.peekNextContainerToDeliver())
     }
     return this
   }
@@ -63,9 +61,10 @@ data class State(
 
   private fun tryTakingNextContainerByShip(): State {
     if (port.containersAtPort == 0) return this
-    val newShip = ship.tryCarryContainer(Trip(4))
-    if (newShip !== ship) {
-      return copy(ship = newShip, port = port.peekNextContainerToDeliver())
+
+    val trip = Trip(4)
+    if (ship.canCarryContainer(trip)) {
+      return copy(ship = ship.carryContainer(trip), port = port.peekNextContainerToDeliver())
     }
     return this
   }

@@ -4,9 +4,12 @@ data class Ship(
   private val trip: Trip = Trip(0),
 ): ContainerHandler {
 
-  override fun tryCarryContainer(trip: Trip): Ship =
-    if (this.trip.inProgress) this
-    else copy(trip=trip)
+  override fun canCarryContainer(trip: Trip): Boolean =
+    !this.trip.inProgress
+
+  override fun carryContainer(trip: Trip): Ship =
+    if (canCarryContainer(trip)) copy(trip=trip)
+    else throw IllegalStateException("Ship is not available now.")
 
   override fun move(): Ship =
     when {
