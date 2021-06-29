@@ -10,6 +10,6 @@ data class Factory(
   fun nextContainerToDeliver(): Char =
     containersAtFactory.first()
 
-  fun peekNextContainerToDeliver(): String =
-    containersAtFactory.drop(1)
+  fun peekNextContainerToDeliver(): Factory =
+    copy(containersAtFactory=containersAtFactory.drop(1))
 }
