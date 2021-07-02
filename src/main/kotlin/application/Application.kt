@@ -1,5 +1,7 @@
 package application
 
+import application.map.Factory
+
 class Application {
 
   private val simulator = TimeSimulator()
