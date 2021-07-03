@@ -26,16 +26,16 @@ data class State(
         && carriers.none { it.hasDeliveryInProgress() }
 
   fun calculateNextState(): State =
-    tryTakingNextContainersAtFactory()
-      .tryTakingNextContainerAtPort()
+    loadContainersInTrucksAtFactory()
+      .loadContainerInShipAtPort()
       .moveCarriers()
       .unloadTrucksAtPort()
 
-  private fun tryTakingNextContainersAtFactory(): State =
+  private fun loadContainersInTrucksAtFactory(): State =
     trucks.filter { it.isAtDeparture() }
       .fold(this, ::nextState)
 
-  private fun tryTakingNextContainerAtPort(): State =
+  private fun loadContainerInShipAtPort(): State =
     if (ship.isAtDeparture())
       port.nextContainerToDeliver()
         .map { Itinerary(4) }
@@ -43,13 +43,13 @@ data class State(
         .orElse(this)
     else this
 
-  private fun unloadTrucksAtPort(): State =
-    copy(port = port.putInWarehouse(numberOfTrucksArrivedToPort))
-
   private fun moveCarriers(): State = copy(
     trucks = trucks.map { it.move() }.toSet(),
     ship = ship.move(),
   )
+
+  private fun unloadTrucksAtPort(): State =
+    copy(port = port.putInWarehouse(numberOfTrucksArrivedToPort))
 }
 
 private fun nextState(state: State, truck: Carrier) =
