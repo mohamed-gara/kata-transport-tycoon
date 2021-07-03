@@ -23,7 +23,7 @@ data class State(
   fun allContainersAreDelivered(): Boolean =
     factory.hasNoContainerToDeliver()
         && port.hasNoContainerToDeliver()
-        && carriers.none { it.hasDeliveryInProgress() }
+        && carriers.noneHasDeliveryInProgress()
 
   fun calculateNextState(): State =
     loadContainersInTrucksAtFactory()
@@ -44,7 +44,7 @@ data class State(
     else this
 
   private fun moveCarriers(): State = copy(
-    trucks = trucks.map { it.move() }.toSet(),
+    trucks = trucks.moveAll(),
     ship = ship.move(),
   )
 

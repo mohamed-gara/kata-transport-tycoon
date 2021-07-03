@@ -44,3 +44,9 @@ data class Carrier(
     return id.hashCode()
   }
 }
+
+fun Set<Carrier>.moveAll() =
+  map { it.move() }.toSet()
+
+fun List<Carrier>.noneHasDeliveryInProgress() =
+  none { it.hasDeliveryInProgress() }
