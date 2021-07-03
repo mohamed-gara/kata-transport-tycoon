@@ -2,9 +2,10 @@ package application.carriers
 
 import application.map.Itinerary
 
+
 data class Carrier(
   val id: String,
-  val currentItinerary: Itinerary = Itinerary(Container("", "", ""),0)
+  val currentItinerary: Itinerary = NO_ITINERARY
 ) {
 
   fun carryContainer(itinerary: Itinerary): Carrier =
@@ -44,6 +45,8 @@ data class Carrier(
     return id.hashCode()
   }
 }
+
+val NO_ITINERARY = Itinerary(Container("", "", ""), 0)
 
 fun Set<Carrier>.moveAll() =
   map { it.move() }.toSet()

@@ -4,10 +4,7 @@ import application.carriers.Carrier
 import application.carriers.Container
 import application.carriers.moveAll
 import application.carriers.noneHasDeliveryInProgress
-import application.map.Factory
-import application.map.Port
-import application.map.Itinerary
-import application.map.truckItineraryFor
+import application.map.*
 
 
 data class State(
@@ -42,7 +39,7 @@ data class State(
   private fun loadContainerInShipAtPort(): State =
     if (ship.isAtDeparture())
       port.nextContainerToDeliver()
-        .map { container -> Itinerary(container, 4) }
+        .map { container -> shipItineraryFor(container) }
         .map { itinerary -> copy(ship = ship.carryContainer(itinerary), port = port.peekNextContainerToDeliver()) }
         .orElse(this)
     else this

@@ -29,3 +29,6 @@ fun truckItineraryFor(container: Container): Itinerary {
   val duration: Int = destinations[container.destination] ?: 0
   return Itinerary(container, duration)
 }
+
+fun shipItineraryFor(container: Container): Itinerary =
+  Itinerary(container, 4)
