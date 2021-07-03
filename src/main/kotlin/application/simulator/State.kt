@@ -56,7 +56,7 @@ data class State(
 
 private fun nextState(state: State, truck: Carrier): State =
   state.factory.nextContainerToDeliver()
-    .map { destination -> truckItineraryFor(destination) }
+    .map { container -> truckItineraryFor(container) }
     .map { itinerary -> truck.copy(currentItinerary = itinerary) }
     .map { truck ->
       state.copy(

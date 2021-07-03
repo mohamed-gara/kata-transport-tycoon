@@ -1,5 +1,7 @@
 package application.map
 
+import application.carriers.Container
+
 data class Itinerary(
   val duration: Int,
   val elapsedDuration: Int = 0,
@@ -18,11 +20,11 @@ data class Itinerary(
     else this
 }
 
-fun truckItineraryFor(destination: Char): Itinerary {
+fun truckItineraryFor(container: Container): Itinerary {
   val destinations = mapOf(
-    'A' to 1,
-    'B' to 5,
+    "A" to 1,
+    "B" to 5,
   )
-  val duration: Int = destinations[destination] ?: 0
+  val duration: Int = destinations[container.destination] ?: 0
   return Itinerary(duration)
 }

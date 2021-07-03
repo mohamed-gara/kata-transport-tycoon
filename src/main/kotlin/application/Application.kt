@@ -1,6 +1,6 @@
 package application
 
-import application.map.Factory
+import application.map.factoryWith
 import application.simulator.State
 import application.simulator.TimeSimulator
 
@@ -10,7 +10,7 @@ class Application {
 
   fun transport(containersDestinations: String): Int =
     simulator.calculateEndHour(
-      initialState = State(Factory(containersDestinations)) ,
+      initialState = State(factoryWith(containersDestinations)) ,
       eachHour     = State::calculateNextState,
       stopWhen     = State::allContainersAreDelivered
     )
