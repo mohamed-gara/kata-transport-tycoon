@@ -1,4 +1,4 @@
-package application
+package application.simulator
 
 import application.carriers.Carrier
 import application.map.Factory
