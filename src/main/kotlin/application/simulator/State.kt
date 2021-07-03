@@ -21,7 +21,7 @@ data class State(
     get() = listOf(trucks, listOf(ship)).flatten()
 
   private val containersArrivedToPort: List<Container>
-    get() = trucks.filter { it.isAtDestination() && it.currentItinerary.duration == 1 } // TODO make destination explicit
+    get() = trucks.filter { it.isAtDestination() && it.currentItinerary.container.destination == "A" }
       .map { it.currentItinerary.container }
 
   fun allContainersAreDelivered(): Boolean =
