@@ -4,30 +4,30 @@ import application.map.Itinerary
 
 data class Carrier(
   val id: String,
-  private val itinerary: Itinerary = Itinerary(0)
+  val currentItinerary: Itinerary = Itinerary(0)
 ) {
 
   fun carryContainer(itinerary: Itinerary): Carrier =
-    if (canCarryContainer(itinerary)) copy(itinerary= itinerary)
-    else throw IllegalStateException("Truck $id is not available now.")
+    if (canCarryContainer()) copy(currentItinerary= itinerary)
+    else throw IllegalStateException("$id is not available now.")
 
-  private fun canCarryContainer(itinerary: Itinerary): Boolean =
-    !this.itinerary.inProgress
+  private fun canCarryContainer(): Boolean =
+    !this.currentItinerary.inProgress
 
   fun move(): Carrier =
     when {
-      itinerary.inProgress -> copy(itinerary = itinerary.advance())
+      currentItinerary.inProgress -> copy(currentItinerary = currentItinerary.advance())
       else -> this
     }
 
   fun hasDeliveryInProgress(): Boolean =
-    itinerary.deliveryInProgress
-
-  fun isAtDestination(): Boolean =
-    itinerary.elapsedDuration == itinerary.duration && itinerary.duration == 1
+    currentItinerary.deliveryInProgress
 
   fun isAtDeparture(): Boolean =
-    !itinerary.inProgress
+    !currentItinerary.inProgress
+
+  fun isAtDestination(): Boolean =
+    currentItinerary.elapsedDuration == currentItinerary.duration
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

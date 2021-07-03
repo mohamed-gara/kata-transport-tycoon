@@ -1,6 +1,8 @@
 package application.simulator
 
 import application.carriers.Carrier
+import application.carriers.moveAll
+import application.carriers.noneHasDeliveryInProgress
 import application.map.Factory
 import application.map.Port
 import application.map.Itinerary
@@ -18,7 +20,7 @@ data class State(
     get() = listOf(trucks, listOf(ship)).flatten()
 
   private val numberOfTrucksArrivedToPort: Int
-    get() = trucks.count { it.isAtDestination() } // TODO rename method
+    get() = trucks.count { it.isAtDestination() && it.currentItinerary.duration == 1 } // TODO make destination explicit
 
   fun allContainersAreDelivered(): Boolean =
     factory.hasNoContainerToDeliver()
@@ -52,10 +54,10 @@ data class State(
     copy(port = port.putInWarehouse(numberOfTrucksArrivedToPort))
 }
 
-private fun nextState(state: State, truck: Carrier) =
+private fun nextState(state: State, truck: Carrier): State =
   state.factory.nextContainerToDeliver()
     .map { destination -> truckItineraryFor(destination) }
-    .map { itinerary -> truck.copy(itinerary = itinerary) }
+    .map { itinerary -> truck.copy(currentItinerary = itinerary) }
     .map { truck ->
       state.copy(
         trucks = setOf(truck).plus(state.trucks),
