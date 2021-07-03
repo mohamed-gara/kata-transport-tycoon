@@ -1,21 +1,22 @@
 package application.map
 
+import application.carriers.Container
 import java.util.*
 
 data class Port(
-  val containersAtPort: Int = 0
+  val containersAtPort: List<Container> = listOf()
 ) {
 
   fun hasNoContainerToDeliver(): Boolean =
-    containersAtPort == 0
+    containersAtPort.isEmpty()
 
-  fun nextContainerToDeliver(): Optional<Int> =
-    if (containersAtPort > 0) Optional.of(1)
+  fun nextContainerToDeliver(): Optional<Container> =
+    if (containersAtPort.isNotEmpty()) Optional.of(containersAtPort.first())
     else Optional.empty()
 
   fun peekNextContainerToDeliver(): Port =
-    copy(containersAtPort=containersAtPort-1)
+    copy(containersAtPort=containersAtPort.drop(1))
 
-  fun putInWarehouse(numberOfTrucksArrivedToPort: Int): Port =
-    copy(containersAtPort = containersAtPort + numberOfTrucksArrivedToPort)
+  fun putInWarehouse(containersArrivedToPort: List<Container>): Port =
+    copy(containersAtPort = containersAtPort + containersArrivedToPort)
 }

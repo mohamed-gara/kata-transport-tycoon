@@ -4,7 +4,7 @@ import application.map.Itinerary
 
 data class Carrier(
   val id: String,
-  val currentItinerary: Itinerary = Itinerary(0)
+  val currentItinerary: Itinerary = Itinerary(Container("", "", ""),0)
 ) {
 
   fun carryContainer(itinerary: Itinerary): Carrier =

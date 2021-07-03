@@ -3,6 +3,7 @@ package application.map
 import application.carriers.Container
 
 data class Itinerary(
+  val container: Container,
   val duration: Int,
   val elapsedDuration: Int = 0,
 ) {
@@ -26,5 +27,5 @@ fun truckItineraryFor(container: Container): Itinerary {
     "B" to 5,
   )
   val duration: Int = destinations[container.destination] ?: 0
-  return Itinerary(duration)
+  return Itinerary(container, duration)
 }
