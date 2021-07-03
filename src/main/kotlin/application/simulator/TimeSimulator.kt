@@ -8,9 +8,9 @@ data class TimeSimulator(
 ) {
 
   fun calculateEndHour(
+    initialState: State,
     eachHour: (State) -> State,
-    stopWhen: (State) -> Boolean,
-    initialState: State
+    stopWhen: (State) -> Boolean
   ): Int {
 
     var currentState = initialState
