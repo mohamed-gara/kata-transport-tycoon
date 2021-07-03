@@ -1,8 +1,6 @@
 package application
 
 import application.carriers.Carrier
-import application.carriers.Ship
-import application.carriers.Truck
 import application.map.Factory
 import application.map.Port
 import application.map.Itinerary
@@ -10,61 +8,58 @@ import application.map.truckItineraryFor
 
 
 data class State(
-  private val factory: Factory,
-  private val port: Port = Port(),
-  private val truck1: Truck = Truck("1"),
-  private val truck2: Truck = Truck("2"),
-  private val ship: Ship = Ship(),
+  val factory: Factory,
+  val port: Port = Port(),
+  val trucks: Set<Carrier> = setOf(Carrier("truck_1"), Carrier("truck_2")),
+  val ship: Carrier = Carrier("ship"),
 ) {
 
-  private val containerHandlers: List<Carrier>
-    get() = listOf(truck1, truck2, ship)
-
-  private val trucks: List<Truck>
-    get() = listOf(truck1, truck2)
+  private val carriers: List<Carrier>
+    get() = listOf(trucks, listOf(ship)).flatten()
 
   private val numberOfTrucksArrivedToPort: Int
-    get() = trucks.count { it.isAtPort() }
+    get() = trucks.count { it.isAtDestination() } // TODO rename method
 
   fun allContainersAreDelivered(): Boolean =
     factory.hasNoContainerToDeliver()
         && port.hasNoContainerToDeliver()
-        && containerHandlers.none { it.hasDeliveryInProgress() }
+        && carriers.none { it.hasDeliveryInProgress() }
 
   fun calculateNextState(): State =
-    tryTakingNextContainerByTruck1()
-      .tryTakingNextContainerByTruck2()
-      .tryTakingNextContainerByShip()
-      .moveHandlers()
+    tryTakingNextContainersAtFactory()
+      .tryTakingNextContainerAtPort()
+      .moveCarriers()
       .unloadTrucksAtPort()
 
-  private fun tryTakingNextContainerByTruck1(): State =
-    factory.nextContainerToDeliver()
-      .map { truckItineraryFor(it) }
-      .filter { itinerary -> truck1.canCarryContainer(itinerary) }
-      .map { itinerary -> copy(truck1 = truck1.carryContainer(itinerary), factory = factory.peekNextContainerToDeliver()) }
-      .orElse(this)
+  private fun tryTakingNextContainersAtFactory(): State =
+    trucks.filter { it.isAtDeparture() }
+      .fold(this, ::nextState)
 
-  private fun tryTakingNextContainerByTruck2(): State =
-    factory.nextContainerToDeliver()
-      .map { truckItineraryFor(it) }
-      .filter { itinerary -> truck2.canCarryContainer(itinerary) }
-      .map { itinerary -> copy(truck2 = truck2.carryContainer(itinerary), factory = factory.peekNextContainerToDeliver()) }
-      .orElse(this)
-
-  private fun tryTakingNextContainerByShip(): State =
-    port.nextContainerToDeliver()
-      .map { Itinerary(4) }
-      .filter { itinerary -> ship.canCarryContainer(itinerary) }
-      .map { itinerary -> copy(ship = ship.carryContainer(itinerary), port = port.peekNextContainerToDeliver()) }
-      .orElse(this)
+  private fun tryTakingNextContainerAtPort(): State =
+    if (ship.isAtDeparture())
+      port.nextContainerToDeliver()
+        .map { Itinerary(4) }
+        .map { itinerary -> copy(ship = ship.carryContainer(itinerary), port = port.peekNextContainerToDeliver()) }
+        .orElse(this)
+    else this
 
   private fun unloadTrucksAtPort(): State =
     copy(port = port.putInWarehouse(numberOfTrucksArrivedToPort))
 
-  private fun moveHandlers(): State = copy(
-    truck1 = truck1.move(),
-    truck2 = truck2.move(),
+  private fun moveCarriers(): State = copy(
+    trucks = trucks.map { it.move() }.toSet(),
     ship = ship.move(),
   )
 }
+
+private fun nextState(state: State, truck: Carrier) =
+  state.factory.nextContainerToDeliver()
+    .map { destination -> truckItineraryFor(destination) }
+    .map { itinerary -> truck.copy(itinerary = itinerary) }
+    .map { truck ->
+      state.copy(
+        trucks = setOf(truck).plus(state.trucks),
+        factory = state.factory.peekNextContainersToDeliver()
+      )
+    } // TODO remove plus
+    .orElse(state)

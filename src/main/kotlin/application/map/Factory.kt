@@ -13,6 +13,6 @@ data class Factory(
     if (containersAtFactory.isNotEmpty()) Optional.of(containersAtFactory.first())
     else Optional.empty()
 
-  fun peekNextContainerToDeliver(): Factory =
+  fun peekNextContainersToDeliver(): Factory =
     copy(containersAtFactory=containersAtFactory.drop(1))
 }
