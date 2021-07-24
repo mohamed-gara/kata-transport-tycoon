@@ -7,11 +7,10 @@ import org.junit.jupiter.api.Test
 
 internal class EventsLogTest {
 
-  @Test
-  fun `domain events for A`() {
+  @Test fun `domain events for AB`() {
     val app = Application()
 
-    app.transport("A")
+    app.transport("AB")
 
     assertThat(app.state.events)
       .containsExactly(
@@ -30,7 +29,23 @@ internal class EventsLogTest {
               origin = "FACTORY",
             )
           ),
-        )
+        ),
+        TransportEvent(
+          id = "",
+          event = "DEPART",
+          time = 0,
+          transport_id = 1,
+          kind = "TRUCK",
+          location = "FACTORY",
+          destination = "B",
+          cargo = listOf(
+            Cargo(
+              cargo_id = "1",
+              destination = "B",
+              origin = "FACTORY",
+            )
+          ),
+        ),
       )
   }
 }

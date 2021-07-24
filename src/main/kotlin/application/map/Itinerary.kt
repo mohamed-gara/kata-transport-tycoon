@@ -7,6 +7,12 @@ data class Itinerary(
   val duration: Int,
   val elapsedDuration: Int = 0,
 ) {
+  val destination: String
+    get() = mapOf(
+      "A" to "PORT",
+      "B" to "B",
+    )[container.destination] ?: ""
+
   val inProgress: Boolean
     get() = duration != 0 && elapsedDuration < (duration * 2)
 

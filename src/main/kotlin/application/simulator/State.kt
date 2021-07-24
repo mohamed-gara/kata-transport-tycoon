@@ -9,6 +9,7 @@ data class State(
   val port: Port = Port(),
   val trucks: Set<Carrier> = setOf(Carrier("truck_1"), Carrier("truck_2")),
   val ship: Carrier = Carrier("ship"),
+  val nextTransportId: Int = 0,
   val events: List<TransportEvent> = listOf(),
 ) {
 
@@ -59,7 +60,23 @@ private fun nextState(state: State, truck: Carrier): State =
       state.copy(
         trucks = setOf(truck).plus(state.trucks), // TODO remove plus
         factory = state.factory.peekNextContainersToDeliver(),
-        events = state.events + TransportEvent("", "DEPART", 0, 0, "TRUCK", "FACTORY", "PORT", listOf(Cargo("0", "A", "FACTORY"))),
+        events = state.events + TransportEvent(
+          "",
+          "DEPART",
+          0,
+          state.nextTransportId,
+          "TRUCK",
+          "FACTORY",
+          truck.currentItinerary.destination,
+          listOf(
+            Cargo(
+              state.nextTransportId.toString(),
+              truck.currentItinerary.container.destination,
+            "FACTORY"
+            )
+          )
+        ),
+        nextTransportId = state.nextTransportId + 1,
       )
     }
     .orElse(state)
