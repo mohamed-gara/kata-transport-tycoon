@@ -6,7 +6,9 @@ import application.simulator.TimeSimulator
 
 class Application {
 
-  private val simulator = TimeSimulator()
+  val simulator = TimeSimulator()
+  val state: State
+    get() = simulator.currentState
 
   fun transport(containersDestinations: String): Int =
     simulator.calculateEndHour(

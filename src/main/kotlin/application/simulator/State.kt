@@ -1,9 +1,6 @@
 package application.simulator
 
-import application.carriers.Carrier
-import application.carriers.Container
-import application.carriers.moveAll
-import application.carriers.noneHasDeliveryInProgress
+import application.carriers.*
 import application.map.*
 
 
@@ -12,6 +9,7 @@ data class State(
   val port: Port = Port(),
   val trucks: Set<Carrier> = setOf(Carrier("truck_1"), Carrier("truck_2")),
   val ship: Carrier = Carrier("ship"),
+  val events: List<TransportEvent> = listOf(),
 ) {
 
   private val carriers: List<Carrier>
@@ -59,8 +57,10 @@ private fun nextState(state: State, truck: Carrier): State =
     .map { itinerary -> truck.copy(currentItinerary = itinerary) }
     .map { truck ->
       state.copy(
-        trucks = setOf(truck).plus(state.trucks),
-        factory = state.factory.peekNextContainersToDeliver()
+        trucks = setOf(truck).plus(state.trucks), // TODO remove plus
+        factory = state.factory.peekNextContainersToDeliver(),
+        events = state.events + TransportEvent("", "DEPART", 0, 0, "TRUCK", "FACTORY", "PORT", listOf(Cargo("0", "A", "FACTORY"))),
       )
-    } // TODO remove plus
+    }
     .orElse(state)
+

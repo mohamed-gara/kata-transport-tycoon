@@ -4,7 +4,7 @@ data class TransportEvent(
   val id: String,
   val event: String,
   val time: Int,
-  val transport_id: String,
+  val transport_id: Int,
   val kind: String,
   val location: String,
   val destination: String,

@@ -45,7 +45,7 @@ internal class ApplicationTest {
   fun tests(vararg tests: Pair<String, Int>): List<DynamicTest> =
     listOf(*tests).map { (containers, expectedDuration) ->
       dynamicTest("<$containers> are transported in $expectedDuration hours") {
-        val sut = application.Application()
+        val sut = Application()
 
         val result = sut.transport(containers)
 
