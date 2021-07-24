@@ -46,6 +46,22 @@ internal class EventsLogTest {
             )
           ),
         ),
+        TransportEvent(
+          id = "",
+          event ="ARRIVE",
+          time =1,
+          transport_id =0,
+          kind ="TRUCK",
+          location ="PORT",
+          destination = "",
+          cargo = listOf(
+            Cargo(
+              cargo_id = "0",
+              destination ="A",
+              origin ="FACTORY"
+            )
+          )
+        ),
       )
   }
 }

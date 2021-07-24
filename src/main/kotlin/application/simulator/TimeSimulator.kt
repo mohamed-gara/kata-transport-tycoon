@@ -1,13 +1,5 @@
 package application.simulator
 
-import application.carriers.TransportEvent
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import java.lang.RuntimeException
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.Paths
-import kotlin.io.path.*
-
 data class TimeSimulator(
   private var hour: Int = 0,
   private val logEnabled: Boolean = true
@@ -17,7 +9,7 @@ data class TimeSimulator(
 
   fun calculateEndHour(
     initialState: State,
-    eachHour: (State) -> State,
+    eachHour: (State, hour: Int) -> State,
     stopWhen: (State) -> Boolean
   ): Int {
 
@@ -28,11 +20,10 @@ data class TimeSimulator(
 
       if (stopWhen(currentState)) {
         logMessage("Stop at hour: $hour")
-        logDomainEvents("AB", currentState.events)
         return hour
       }
 
-      currentState = eachHour(currentState)
+      currentState = eachHour(currentState, hour)
 
       advanceTimeToNextHour()
 

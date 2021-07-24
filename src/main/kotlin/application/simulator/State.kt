@@ -17,19 +17,21 @@ data class State(
     get() = listOf(trucks, listOf(ship)).flatten()
 
   private val containersArrivedToPort: List<Container>
+    get() = trucksArrivedToPort.map { it.currentItinerary.container }
+
+  private val trucksArrivedToPort: List<Carrier>
     get() = trucks.filter { it.isAtDestination() && it.currentItinerary.container.destination == "A" }
-      .map { it.currentItinerary.container }
 
   fun allContainersAreDelivered(): Boolean =
     factory.hasNoContainerToDeliver()
         && port.hasNoContainerToDeliver()
         && carriers.noneHasDeliveryInProgress()
 
-  fun calculateNextState(): State =
+  fun calculateNextState(hour: Int): State =
     loadContainersInTrucksAtFactory()
       .loadContainerInShipAtPort()
       .moveCarriers()
-      .unloadTrucksAtPort()
+      .unloadTrucksAtPort(hour)
 
   private fun loadContainersInTrucksAtFactory(): State =
     trucks.filter { it.isAtDeparture() }
@@ -48,19 +50,22 @@ data class State(
     ship = ship.move(),
   )
 
-  private fun unloadTrucksAtPort(): State =
-    copy(port = port.putInWarehouse(containersArrivedToPort))
+  private fun unloadTrucksAtPort(hour: Int): State =
+    copy(
+      port = port.putInWarehouse(containersArrivedToPort),
+      events = events + trucksArrivedToPort.map { truck -> truckPortArriveEvent(hour, truck) },
+    )
 }
 
 private fun nextState(state: State, truck: Carrier): State =
   state.factory.nextContainerToDeliver()
-    .map { container -> truckItineraryFor(container) }
+    .map { container -> truckItineraryFor(state.nextTransportId, container) }
     .map { itinerary -> truck.copy(currentItinerary = itinerary) }
-    .map { truck ->
+    .map { updatedTruck ->
       state.copy(
-        trucks = setOf(truck).plus(state.trucks), // TODO remove plus
+        trucks = setOf(updatedTruck).plus(state.trucks), // TODO remove plus
         factory = state.factory.peekNextContainersToDeliver(),
-        events = state.events + truckDepartEvent(state, truck),
+        events = state.events + truckDepartEvent(state, updatedTruck),
         nextTransportId = state.nextTransportId + 1,
       )
     }
@@ -86,3 +91,22 @@ private fun truckDepartEvent(
   )
 )
 
+private fun truckPortArriveEvent(
+  hour: Int,
+  truck: Carrier
+) = TransportEvent(
+  "",
+  "ARRIVE",
+  hour+1,
+  truck.currentItinerary.transportId,
+  "TRUCK",
+  "PORT",
+  "",
+  listOf(
+    Cargo(
+      truck.currentItinerary.transportId.toString(),
+      truck.currentItinerary.container.destination,
+      "FACTORY"
+    )
+  )
+)

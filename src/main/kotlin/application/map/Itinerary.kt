@@ -6,6 +6,7 @@ data class Itinerary(
   val container: Container,
   val duration: Int,
   val elapsedDuration: Int = 0,
+  val transportId: Int = 0,
 ) {
   val destination: String
     get() = mapOf(
@@ -27,13 +28,13 @@ data class Itinerary(
     else this
 }
 
-fun truckItineraryFor(container: Container): Itinerary {
+fun truckItineraryFor(transportId: Int, container: Container): Itinerary {
   val destinations = mapOf(
     "A" to 1,
     "B" to 5,
   )
   val duration: Int = destinations[container.destination] ?: 0
-  return Itinerary(container, duration)
+  return Itinerary(container, duration, transportId = transportId)
 }
 
 fun shipItineraryFor(container: Container): Itinerary =
