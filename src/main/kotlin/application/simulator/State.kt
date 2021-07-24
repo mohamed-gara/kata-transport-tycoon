@@ -60,24 +60,29 @@ private fun nextState(state: State, truck: Carrier): State =
       state.copy(
         trucks = setOf(truck).plus(state.trucks), // TODO remove plus
         factory = state.factory.peekNextContainersToDeliver(),
-        events = state.events + TransportEvent(
-          "",
-          "DEPART",
-          0,
-          state.nextTransportId,
-          "TRUCK",
-          "FACTORY",
-          truck.currentItinerary.destination,
-          listOf(
-            Cargo(
-              state.nextTransportId.toString(),
-              truck.currentItinerary.container.destination,
-            "FACTORY"
-            )
-          )
-        ),
+        events = state.events + truckDepartEvent(state, truck),
         nextTransportId = state.nextTransportId + 1,
       )
     }
     .orElse(state)
+
+private fun truckDepartEvent(
+  state: State,
+  truck: Carrier
+) = TransportEvent(
+  "",
+  "DEPART",
+  0,
+  state.nextTransportId,
+  "TRUCK",
+  "FACTORY",
+  truck.currentItinerary.destination,
+  listOf(
+    Cargo(
+      state.nextTransportId.toString(),
+      truck.currentItinerary.container.destination,
+      "FACTORY"
+    )
+  )
+)
 
