@@ -1,14 +1,14 @@
 package application.carriers
 
 data class TransportEvent(
-  val id: String,
+  val id: String = "",
   val event: String,
   val time: Int,
   val transport_id: Int,
   val kind: String,
   val location: String,
-  val destination: String,
-  val cargo: List<Cargo>,
+  val destination: String = "",
+  val cargo: List<Cargo> = listOf(),
 ) {
 
 }
