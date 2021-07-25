@@ -36,6 +36,7 @@ data class State(
       .moveCarriers()
       .unloadTrucksAtPort(hour)
       .unloadTrucksAtB(hour)
+      .unloadShipAtA(hour)
       .finishTruckItinerary(hour)
 
   private fun loadContainersInTrucksAtFactory(): State =
@@ -82,6 +83,16 @@ data class State(
         )
       },
     )
+
+  private fun unloadShipAtA(hour: Int): State =
+    if (ship.isAtDestination() && ship.currentItinerary.inProgress)
+      copy(
+        events = events + listOf(
+          shipArriveToAEvent(hour, ship),
+        )
+      )
+    else
+      this
 
   private fun finishTruckItinerary(hour: Int): State =
     copy(
@@ -160,26 +171,6 @@ private fun truckDepartFromPortToFactoryEvent(
   listOf()
 )
 
-private fun shipDepartFromPortEvent(
-  hour: Int,
-  ship: Carrier,
-) = TransportEvent(
-  "",
-  "DEPART",
-  hour,
-  ship.currentItinerary.transportId,
-  "SHIP",
-  "PORT",
-  "A",
-  listOf(
-    Cargo(
-      ship.currentItinerary.container.id,
-      ship.currentItinerary.container.destination,
-      "FACTORY"
-    )
-  )
-)
-
 private fun truckArriveToFactoryEvent(
   hour: Int,
   truck: Carrier
@@ -226,4 +217,44 @@ private fun truckDepartFromBToFactoryEvent(
   "B",
   "FACTORY",
   listOf()
+)
+
+private fun shipDepartFromPortEvent(
+  hour: Int,
+  ship: Carrier,
+) = TransportEvent(
+  "",
+  "DEPART",
+  hour,
+  ship.currentItinerary.transportId,
+  "SHIP",
+  "PORT",
+  "A",
+  listOf(
+    Cargo(
+      ship.currentItinerary.container.id,
+      ship.currentItinerary.container.destination,
+      "FACTORY"
+    )
+  )
+)
+
+private fun shipArriveToAEvent(
+  hour: Int,
+  ship: Carrier
+) = TransportEvent(
+  "",
+  "ARRIVE",
+  hour + 1,
+  ship.currentItinerary.transportId,
+  "SHIP",
+  "A",
+  "",
+  listOf(
+    Cargo(
+      ship.currentItinerary.container.id,
+      ship.currentItinerary.container.destination,
+      "FACTORY"
+    )
+  )
 )
