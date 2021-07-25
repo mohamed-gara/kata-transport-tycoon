@@ -89,6 +89,7 @@ data class State(
       copy(
         events = events + listOf(
           shipArriveToAEvent(hour, ship),
+          shipDepartFromAToPortEvent(hour, ship),
         )
       )
     else
@@ -257,4 +258,18 @@ private fun shipArriveToAEvent(
       "FACTORY"
     )
   )
+)
+
+private fun shipDepartFromAToPortEvent(
+  hour: Int,
+  ship: Carrier,
+) = TransportEvent(
+  "",
+  "DEPART",
+  hour+1,
+  ship.currentItinerary.transportId,
+  "SHIP",
+  "A",
+  "PORT",
+  listOf()
 )
