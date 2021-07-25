@@ -22,6 +22,9 @@ data class State(
   private val trucksArrivedToPort: List<Carrier>
     get() = trucks.filter { it.isAtDestination() && it.currentItinerary.container.destination == "A" }
 
+  private val trucksArrivedToB: List<Carrier>
+    get() = trucks.filter { it.isAtDestination() && it.currentItinerary.container.destination == "B" }
+
   fun allContainersAreDelivered(): Boolean =
     factory.hasNoContainerToDeliver()
         && port.hasNoContainerToDeliver()
@@ -32,6 +35,7 @@ data class State(
       .loadContainerInShipAtPort(hour)
       .moveCarriers()
       .unloadTrucksAtPort(hour)
+      .unloadTrucksAtB(hour)
       .finishTruckItinerary(hour)
 
   private fun loadContainersInTrucksAtFactory(): State =
@@ -67,6 +71,11 @@ data class State(
           truckDepartFromPortToFactoryEvent(hour, truck),
         )
       },
+    )
+
+  private fun unloadTrucksAtB(hour: Int): State =
+    copy(
+      events = events + trucksArrivedToB.map { truck -> truckArriveToBEvent(hour, truck) },
     )
 
   private fun finishTruckItinerary(hour: Int): State =
@@ -178,4 +187,24 @@ private fun truckArriveToFactoryEvent(
   "FACTORY",
   "",
   listOf()
+)
+
+private fun truckArriveToBEvent(
+  hour: Int,
+  truck: Carrier
+) = TransportEvent(
+  "",
+  "ARRIVE",
+  hour + 1,
+  truck.currentItinerary.transportId,
+  "TRUCK",
+  "B",
+  "",
+  listOf(
+    Cargo(
+      truck.currentItinerary.container.id,
+      truck.currentItinerary.container.destination,
+      "FACTORY"
+    )
+  )
 )
