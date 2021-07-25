@@ -18,7 +18,7 @@ internal class EventsLogTest {
     val expected_events_for_AB: List<TransportEvent> = jacksonObjectMapper().readValue(fileContent)
 
     assertThat(app.state.events).containsExactlyElementsOf(expected_events_for_AB)
-    assertThat(app.state.events)
+    assertThat(expected_events_for_AB)
       .containsExactly(
         TransportEvent(
           id = "",
