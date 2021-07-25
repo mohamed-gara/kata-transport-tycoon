@@ -75,7 +75,12 @@ data class State(
 
   private fun unloadTrucksAtB(hour: Int): State =
     copy(
-      events = events + trucksArrivedToB.map { truck -> truckArriveToBEvent(hour, truck) },
+      events = events + trucksArrivedToB.flatMap { truck ->
+        listOf(
+          truckArriveToBEvent(hour, truck),
+          truckDepartFromBToFactoryEvent(hour, truck),
+        )
+      },
     )
 
   private fun finishTruckItinerary(hour: Int): State =
@@ -207,4 +212,18 @@ private fun truckArriveToBEvent(
       "FACTORY"
     )
   )
+)
+
+private fun truckDepartFromBToFactoryEvent(
+  hour: Int,
+  truck: Carrier,
+) = TransportEvent(
+  "",
+  "DEPART",
+  hour+1,
+  truck.currentItinerary.transportId,
+  "TRUCK",
+  "B",
+  "FACTORY",
+  listOf()
 )
