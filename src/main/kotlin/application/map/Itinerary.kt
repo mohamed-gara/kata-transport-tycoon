@@ -37,5 +37,5 @@ fun truckItineraryFor(transportId: Int, container: Container): Itinerary {
   return Itinerary(container, duration, transportId = transportId)
 }
 
-fun shipItineraryFor(container: Container): Itinerary =
-  Itinerary(container, 4)
+fun shipItineraryFor(nextTransportId: Int, container: Container): Itinerary =
+  Itinerary(container, 4, transportId = nextTransportId)

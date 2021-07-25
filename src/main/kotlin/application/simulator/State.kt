@@ -29,7 +29,7 @@ data class State(
 
   fun calculateNextState(hour: Int): State =
     loadContainersInTrucksAtFactory()
-      .loadContainerInShipAtPort()
+      .loadContainerInShipAtPort(hour)
       .moveCarriers()
       .unloadTrucksAtPort(hour)
 
@@ -37,11 +37,18 @@ data class State(
     trucks.filter { it.isAtDeparture() }
       .fold(this, ::nextState)
 
-  private fun loadContainerInShipAtPort(): State =
+  private fun loadContainerInShipAtPort(hour: Int): State =
     if (ship.isAtDeparture())
       port.nextContainerToDeliver()
-        .map { container -> shipItineraryFor(container) }
-        .map { itinerary -> copy(ship = ship.carryContainer(itinerary), port = port.peekNextContainerToDeliver()) }
+        .map { container -> shipItineraryFor(this.nextTransportId, container) }
+        .map { itinerary -> ship.carryContainer(itinerary) }
+        .map { updatedShip ->
+          copy(
+            ship = updatedShip,
+            port = port.peekNextContainerToDeliver(),
+            events = events + shipDepartFromPortEvent(hour, updatedShip)
+          )
+        }
         .orElse(this)
     else this
 
@@ -130,3 +137,22 @@ private fun truckDepartFromPortToFactoryEvent(
   listOf()
 )
 
+private fun shipDepartFromPortEvent(
+  hour: Int,
+  ship: Carrier,
+) = TransportEvent(
+  "",
+  "DEPART",
+  hour,
+  ship.currentItinerary.transportId,
+  "SHIP",
+  "PORT",
+  "A",
+  listOf(
+    Cargo(
+      ship.currentItinerary.container.id,
+      ship.currentItinerary.container.destination,
+      "FACTORY"
+    )
+  )
+)

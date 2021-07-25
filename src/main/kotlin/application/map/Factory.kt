@@ -19,4 +19,4 @@ data class Factory(
 }
 
 fun factoryWith(containersDestinations: String) =
-  Factory(containersDestinations.toList().map { Container("", "FACTORY", it.toString()) })
+  Factory(containersDestinations.toList().mapIndexed { index, container -> Container(index.toString(), "FACTORY", container.toString()) })
