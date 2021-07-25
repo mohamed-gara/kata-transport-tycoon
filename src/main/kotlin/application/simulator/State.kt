@@ -32,6 +32,7 @@ data class State(
       .loadContainerInShipAtPort(hour)
       .moveCarriers()
       .unloadTrucksAtPort(hour)
+      .finishTruckItinerary(hour)
 
   private fun loadContainersInTrucksAtFactory(): State =
     trucks.filter { it.isAtDeparture() }
@@ -66,6 +67,14 @@ data class State(
           truckDepartFromPortToFactoryEvent(hour, truck),
         )
       },
+    )
+
+  private fun finishTruckItinerary(hour: Int): State =
+    copy(
+      trucks = trucks.map { if (it.isAtDeparture() && it.currentItinerary !== NO_ITINERARY) it.copy(currentItinerary= NO_ITINERARY) else it}.toSet(),
+      events = events +
+          trucks.filter { it.isAtDeparture() && it.currentItinerary !== NO_ITINERARY }
+                .map { truck -> truckArriveToFactoryEvent(hour, truck) },
     )
 }
 
@@ -155,4 +164,18 @@ private fun shipDepartFromPortEvent(
       "FACTORY"
     )
   )
+)
+
+private fun truckArriveToFactoryEvent(
+  hour: Int,
+  truck: Carrier
+) = TransportEvent(
+  "",
+  "ARRIVE",
+  hour + 1,
+  truck.currentItinerary.transportId,
+  "TRUCK",
+  "FACTORY",
+  "",
+  listOf()
 )
