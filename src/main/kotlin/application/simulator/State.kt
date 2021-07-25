@@ -53,7 +53,12 @@ data class State(
   private fun unloadTrucksAtPort(hour: Int): State =
     copy(
       port = port.putInWarehouse(containersArrivedToPort),
-      events = events + trucksArrivedToPort.map { truck -> truckPortArriveEvent(hour, truck) },
+      events = events + trucksArrivedToPort.flatMap { truck ->
+        listOf(
+          truckPortArriveEvent(hour, truck),
+          truckDepartFromPortToFactoryEvent(hour, truck),
+        )
+      },
     )
 }
 
@@ -110,3 +115,18 @@ private fun truckPortArriveEvent(
     )
   )
 )
+
+private fun truckDepartFromPortToFactoryEvent(
+  hour: Int,
+  truck: Carrier,
+) = TransportEvent(
+  "",
+  "DEPART",
+  hour+1,
+  truck.currentItinerary.transportId,
+  "TRUCK",
+  "PORT",
+  "FACTORY",
+  listOf()
+)
+
